@@ -1,0 +1,11 @@
+__pycache__
+.ipynb_checkpoints
+amazon_review_full_csv
+
+*.csv
+*.tar.gz
+*.ipynb
+*.txt
+*.pdf
+
+!stopwords/*

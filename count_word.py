@@ -14,27 +14,32 @@ n_core = 5
 review_process = list()
 
 # Lista con caracteres especiales
-_Review__characters = [',', '.', '(', ')', '?', '!', '\"', '-', ':', '/']
+_Review__characters = [',', '.', '(', ')', '?', '!', '\"', '-', ':', '/', '$']
 _Review__characters.extend([str(i) for i in range(10)])
+_Review__characters = np.array(_Review__characters)
 
 _Review__top_common = 20
 
 # Lista con las stopword
-# stopwords_path = 'stopwords/stop_words_en_nltk.txt'
-stopwords_path = 'stopwords/stop_words_en_1298.txt'
-# stopwords_path = 'stopwords/stop_words_en_nltk.txt'
-
+stopwords_path = 'stopwords/stop_words_en_nltk.txt'
 _Review__stopwords = list()
 with open(stopwords_path) as f:
     lines = f.readlines()
     for line in lines:
-        _Review__stopwords.extend([line.replace("\n", "")])
+        _Review__stopwords.extend([line.replace('\n', '')])
+_Review__stopwords = np.array(_Review__stopwords)
 
+# Parámetros generales
 train_csv_path = 'train_csv'
 split_csv_path = 'split_csv'
 amount_time = [['amount', 'serial_time', 'process_time']]
 
 class Review():
+
+    """
+        Clase para realizar el conteo de palabras de acuerdo
+        a la clasificación de una reseña.
+    """
 
     most_common_word = None
 
@@ -55,14 +60,14 @@ class Review():
                     self.most_common_word.append(w)
         counter = Counter(self.most_common_word)
         self.most_common_word = counter.most_common(__top_common)
-    
-    def get_characters(self):
-        return __characters
-
-# lista = [review 1, review 2] --> Core 1
-# lista = [review 3, review 4, review 5] --> Core 2
 
 class ReviewProcess(multiprocessing.Process):
+
+    """
+        Clase para realizar el conteo de palabras mediante 
+        procesos. Recibe como parámetro una lista de la
+        clase Review.
+    """
 
     def __init__(self, review_list):
         multiprocessing.Process.__init__(self)
@@ -73,7 +78,9 @@ class ReviewProcess(multiprocessing.Process):
             r.count_words()
         return
 
-
+# Crea una lista de la clase Review de 
+# acuerdo con los dataset divididos por
+# valor de calificación
 def load_review_data(file_path_list):
     global review_process
 
@@ -82,11 +89,14 @@ def load_review_data(file_path_list):
         df = read_csv(f)
         review_process.append(Review(df, 'Review rating ' + str(df.iloc[0, 0])))
 
+# Imprime las palabras que más se repiten
+# en una Review
 def print_review_most_common():
     for r in review_process:
         print(f'{r.name}:')
         print(r.most_common_word, '\n')
 
+# Realiza el conteo de manera secuencial
 def start_serial():
     start_time = time.time()
     for r in review_process:
@@ -95,8 +105,8 @@ def start_serial():
     print(f'Tiempo Serial: {serial_total_time}')
     print_review_most_common()
     return serial_total_time
-    
 
+# Realiza el conteo mediante procesos
 def start_process():
     review_len = len(review_process)
     start_time = time.time()
@@ -120,11 +130,13 @@ def start_process():
     print(f'Tiempo por Procesos: {process_total_time}')
     print_review_most_common()
     return process_total_time
-    
+
+# Realiza la división del dataset principal de
+# acuerdo con el valor de la reseña.
 def split_into_reviews(df):
     review_id = df.iloc[:, 0].values
-    review_id = np.unique(review_id)
-
+    review_id = np.sort(np.unique(review_id))
+    
     if not os.path.exists(split_csv_path):
         os.makedirs(split_csv_path)
 
@@ -133,6 +145,7 @@ def split_into_reviews(df):
         path = split_csv_path + '/train-' + str(r_id) + '.csv'
         data_by_id.to_csv(path, index=False, header=False)
 
+# Obtiene una lista de archivos en un directorio.
 def read_files_path(root_path, absolute=True):
     file_path = list()
     for f in os.listdir(root_path):
@@ -143,14 +156,18 @@ def read_files_path(root_path, absolute=True):
         file_path.append(path)
     return file_path
 
+# Elimina un directorio.
 def delete_file_path(root_path):
     if os.path.exists(root_path):
         shutil.rmtree(root_path)
 
+# Elimina los directorios generados 
+# durante el proceso.
 def delete_all():
     delete_file_path(train_csv_path)
     delete_file_path(split_csv_path)
 
+# Obtiene una muestra a partir de un porcentaje.
 def make_sample(train_path, n=0.1, random_state=0):
     if not os.path.exists(train_csv_path):
         os.makedirs(train_csv_path)
@@ -161,6 +178,8 @@ def make_sample(train_path, n=0.1, random_state=0):
     print(f'Sample [{dataframe.shape[0]}] complete.')
     dataframe = None
 
+# Realiza vairas muestras a partir de un 
+# acumulador(step).
 def make_sample_step(train_path, step=0.05):
     i = step
     while i <= 1.0:
@@ -168,6 +187,8 @@ def make_sample_step(train_path, step=0.05):
         i += step
         i = round(i, 2)
 
+# Realiza el entrenamiento en secuencial y 
+# mediante procesos.
 def start():
     train_csv_path_list = read_files_path(train_csv_path)
     for f in train_csv_path_list:
@@ -183,5 +204,7 @@ def start():
         delete_file_path(split_csv_path)
     return amount_time
 
+# Genera un Dataframe a partir de un 
+# archivo ".CSV".
 def read_csv(path):
     return pd.read_csv(path, header=None)

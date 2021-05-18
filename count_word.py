@@ -38,8 +38,9 @@ class Review():
 
     most_common_word = None
 
-    def __init__(self, dataset):
+    def __init__(self, dataset, name):
         self.dataset = dataset
+        self.name = name
     
     def count_words(self):
         self.most_common_word = list()
@@ -79,10 +80,11 @@ def load_review_data(file_path_list):
     review_process = list()
     for f in file_path_list:
         df = read_csv(f)
-        review_process.append(Review(df))
+        review_process.append(Review(df, 'Review rating ' + str(df.iloc[0, 0])))
 
 def print_review_most_common():
     for r in review_process:
+        print(f'{r.name}:')
         print(r.most_common_word, '\n')
 
 def start_serial():

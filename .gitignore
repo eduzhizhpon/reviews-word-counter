@@ -7,5 +7,7 @@ amazon_review_full_csv
 *.ipynb
 *.txt
 *.pdf
+*.png
+*.jpg
 
 !stopwords/*

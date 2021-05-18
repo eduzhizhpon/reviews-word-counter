@@ -16,8 +16,8 @@ def create_dir(dir_path):
         makedirs(dir_path)
 
 def plot_serial_process_time(name='fig1.png', df_name='dataframe.csv'):
-    
     df = pd.read_csv(dir_path + "/" + df_name)
+    df.sort_values(by=['amount'], inplace=True)
     x = df['amount']
     serial_y = df['serial_time']
     process_y = df['process_time']

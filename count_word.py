@@ -154,6 +154,7 @@ def read_files_path(root_path, absolute=True):
         else:
             path = root_path + "/" + f
         file_path.append(path)
+    file_path.sort()
     return file_path
 
 # Elimina un directorio.

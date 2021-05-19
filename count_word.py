@@ -55,8 +55,7 @@ class Review():
                 word_string = word_string.replace(character, "")
 
             word_string = np.array(word_string.split())
-            mask = np.isin(word_string, __stopwords, invert=True)
-            self.most_common_word.extend(word_string[mask])
+            self.most_common_word.extend(word_string[np.isin(word_string, __stopwords, invert=True)])
         counter = Counter(self.most_common_word)
         self.most_common_word = counter.most_common(__top_common)
 

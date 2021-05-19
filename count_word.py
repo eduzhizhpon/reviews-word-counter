@@ -54,10 +54,9 @@ class Review():
             for character in __characters:
                 word_string = word_string.replace(character, "")
 
-            word_string = word_string.split()
-            for w in word_string:
-                if w not in __stopwords:
-                    self.most_common_word.append(w)
+            word_string = np.array(word_string.split())
+            mask = np.isin(word_string, __stopwords, invert=True)
+            self.most_common_word.extend(word_string[mask])
         counter = Counter(self.most_common_word)
         self.most_common_word = counter.most_common(__top_common)
 

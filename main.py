@@ -18,6 +18,9 @@ def get_args():
     parser.add_argument("-r", "--run", action='store_true',  
                                 help="Comenzar")
 
+    parser.add_argument("-c", "--core", type=int, default=5, 
+                                help="Cantidad de cores")
+
     return vars(parser.parse_args())
 
 def main():
@@ -27,6 +30,8 @@ def main():
         cw.make_sample_step(train_path=args['sample'], step=0.05)
 
     if not len(sys.argv) > 1 or args['run']:
+        cw.n_core = args['core']
+        print(f'Comenzando entrenamiento con: {cw.n_core} núcleos')
         report.list_to_csv(cw.start(), name='resultados.csv')
     
     if args['plot_report']:

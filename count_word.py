@@ -198,14 +198,14 @@ def start():
     for f in train_csv_path_list:
         df = read_csv(f)
         split_into_reviews(df)
-        df = None
+        df = df.shape[0]
         split_review_path_list = read_files_path(split_csv_path)
         load_review_data(split_review_path_list)
 
         serial_total_time = start_serial()
         process_total_time = start_process()
         
-        amount_time.append([df.shape[0], serial_total_time, process_total_time])
+        amount_time.append([df, serial_total_time, process_total_time])
         delete_file_path(split_csv_path)
     return amount_time
 

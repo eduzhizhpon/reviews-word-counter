@@ -106,12 +106,17 @@ def start_serial():
 
 # Realiza el conteo mediante procesos
 def start_process():
+    global n_core
     review_len = len(review_process)
-    start_time = time.time()
+    if n_core > review_len:
+        n_core = review_len
+
     n = int(review_len/n_core)
     start_index = 0
     end_index = n
     review_process_list = list()
+
+    start_time = time.time()
     for i in range(n_core):
         if i == n_core - 1:
             end_index = review_len

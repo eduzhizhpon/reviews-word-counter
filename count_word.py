@@ -47,7 +47,6 @@ class Review():
         self.dataset = dataset
         self.name = name
     
-    # Realiza el conteo de palabras
     def count_words(self):
         self.most_common_word = list()
         for index, row in self.dataset.iterrows():
@@ -108,15 +107,11 @@ def start_serial():
 # Realiza el conteo mediante procesos
 def start_process():
     review_len = len(review_process)
-    if n_core > review_len:
-        n_core = review_len
-    
+    start_time = time.time()
     n = int(review_len/n_core)
     start_index = 0
     end_index = n
     review_process_list = list()
-
-    start_time = time.time()
     for i in range(n_core):
         if i == n_core - 1:
             end_index = review_len
@@ -129,7 +124,6 @@ def start_process():
 
     for r_p in review_process_list:
         r_p.join()
-    
     process_total_time = time.time() - start_time
     print(f'Tiempo por Procesos: {process_total_time}')
     print_review_most_common()
@@ -199,6 +193,7 @@ def start():
     for f in train_csv_path_list:
         df = read_csv(f)
         split_into_reviews(df)
+        df = None
         split_review_path_list = read_files_path(split_csv_path)
         load_review_data(split_review_path_list)
 
